@@ -27,7 +27,7 @@ ctest --test-dir build -C Release --output-on-failure
 
 No Linux, configure com `cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release` antes de executar o build e o CTest. Os testes cobrem a curva estática, knee, attack, release, range, hold, antecipação, atraso e bypass, mix paralelo, sidechain externo e filtragem de escuta, estabilidade e automação, precisão float/double, resposta e THD a ganho unitário, três taxas de amostragem e restauração de presets antigos e novos.
 
-O GitHub Actions executa o build x64, CTest e pluginval nível 10 no Windows. Tags no formato `vX.Y.Z` geram uma release com o ZIP. Para instalar localmente, copie a pasta `NX PRO C 3.vst3` inteira de `build/NXProC3_artefacts/Release/VST3/` para `C:\Program Files\Common Files\VST3` no Windows ou `~/.vst3/` no Linux, e atualize a lista de plug-ins da DAW.
+O GitHub Actions executa o build x64, CTest e pluginval nível 10 no runner windows-2022, que fornece o Visual Studio 2022. Tags no formato `vX.Y.Z` geram uma release com o ZIP. Para instalar localmente, copie a pasta `NX PRO C 3.vst3` inteira de `build/NXProC3_artefacts/Release/VST3/` para `C:\Program Files\Common Files\VST3` no Windows ou `~/.vst3/` no Linux, e atualize a lista de plug-ins da DAW.
 
 ## Comparação visual
 

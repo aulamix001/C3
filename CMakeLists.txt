@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(NXProC3 VERSION 0.2.0 LANGUAGES C CXX)
+project(NXProC3 VERSION 0.2.1 LANGUAGES C CXX)
 if(POLICY CMP0135)
     cmake_policy(SET CMP0135 NEW)
 endif()
