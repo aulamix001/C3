@@ -21,15 +21,16 @@ jobs:
       - name: Configure CMake
         shell: pwsh
         run: |
-          cmake -S . -B build -G "Visual Studio 17 2022" -A x64 2>&1 | Tee-Object configure.log
+          cmake -S . -B build -G "Visual Studio 17 2022" -A x64 2>&1 | ForEach-Object { "$_" } | Tee-Object configure.log
           if ($LASTEXITCODE -ne 0) {
-            Get-Content configure.log | Select-Object -Last 30 | ForEach-Object { Write-Output "::error::$_" }
+            $diagnostics = (Get-Content configure.log | Select-Object -Last 45) -join '%0A'
+            Write-Output "::error::$diagnostics"
             exit 1
           }
       - name: Build VST3
         shell: pwsh
         run: |
-          cmake --build build --config Release --target NXProC3_VST3 --parallel 3 2>&1 | Tee-Object build.log
+          cmake --build build --config Release --target NXProC3_VST3 --parallel 3 2>&1 | ForEach-Object { "$_" } | Tee-Object build.log
           if ($LASTEXITCODE -ne 0) {
             $errors = Select-String -Path build.log -Pattern 'error|failed' | Select-Object -Last 20
             $errors | ForEach-Object { Write-Output "::error::$($_.Line)" }
