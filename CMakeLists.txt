@@ -3,8 +3,8 @@ project(NXProC3 VERSION 0.1.0 LANGUAGES C CXX)
 
 include(FetchContent)
 FetchContent_Declare(JUCE
-    GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
-    GIT_TAG 29396c22c93392d6738e021b83196283d64d850)
+    URL https://codeload.github.com/juce-framework/JUCE/tar.gz/29396c22c93392d6738e021b83196283d6e4d850
+    URL_HASH SHA256=97cc01e0fe15278f6edadc895a3cf0aac2fd98bcd023823384d5ca7025beb91c)
 FetchContent_MakeAvailable(JUCE)
 
 juce_add_plugin(NXProC3
