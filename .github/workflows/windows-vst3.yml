@@ -1,0 +1,54 @@
+name: Windows x64 VST3
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/windows-vst3.yml, CMakeLists.txt, 'src/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: windows-vst3-release
+  cancel-in-progress: false
+
+jobs:
+  windows-vst3:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build VST3
+        shell: pwsh
+        run: |
+          cmake -S . -B build -G "Visual Studio 17 2022" -A x64
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build build --config Release --target NXProC3_VST3 --parallel 3
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Verify and package VST3
+        shell: pwsh
+        run: |
+          $bundle = 'build/NXProC3_artefacts/Release/VST3/NX PRO C 3.vst3'
+          $module = Join-Path $bundle 'Contents/x86_64-win/NX PRO C 3.vst3'
+          if (!(Test-Path $module -PathType Leaf)) { throw "Windows VST3 module is missing" }
+          $bytes = [IO.File]::ReadAllBytes((Resolve-Path $module))
+          $pe = [BitConverter]::ToInt32($bytes, 0x3c)
+          if ([BitConverter]::ToUInt32($bytes, $pe) -ne 0x4550 -or
+              [BitConverter]::ToUInt16($bytes, $pe + 4) -ne 0x8664) {
+            throw "Expected a Windows x64 PE module"
+          }
+          Compress-Archive -LiteralPath $bundle -DestinationPath NX-PRO-C-3-windows-x64.zip
+      - name: Publish GitHub Release
+        if: github.ref == 'refs/heads/main'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "windows-$($env:GITHUB_SHA.Substring(0, 12))"
+          gh release view $tag --repo $env:GITHUB_REPOSITORY 2>$null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload $tag NX-PRO-C-3-windows-x64.zip --clobber --repo $env:GITHUB_REPOSITORY
+          } else {
+            gh release create $tag NX-PRO-C-3-windows-x64.zip --target $env:GITHUB_SHA --repo $env:GITHUB_REPOSITORY --title "NX PRO C 3 — Windows x64" --notes "VST3 para Windows 64 bits. Extraia a pasta .vst3 inteira para C:\Program Files\Common Files\VST3 e atualize a lista de plug-ins da DAW."
+          }
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
